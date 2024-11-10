@@ -5,10 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
-import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Hotel, Utensils, Camera, Star, MapPin, DollarSign, Clock, LucideIcon } from "lucide-react";
+import { Hotel, Utensils, Camera, Star,  LucideIcon } from "lucide-react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 // Base interface for common properties
 interface BaseItem {
@@ -45,10 +45,7 @@ interface Category {
   items: TourismItem[];
 }
 
-// Props interface for DetailDialog
-interface DetailDialogProps {
-  item: TourismItem;
-}
+
 
 export default function Tourism() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -82,7 +79,7 @@ export default function Tourism() {
           price: 299,
           address: "123 Main Street",
           amenities: ["Pool", "Spa", "Restaurant", "Gym"],
-          images: ["https://images.unsplash.com/photo-1566073771259-6a8506099945"],
+          images: ["/image/3.jpg"],
           openHours: "24/7",
         },
         {
@@ -92,7 +89,7 @@ export default function Tourism() {
           price: 199,
           address: "456 Park Avenue",
           amenities: ["Breakfast", "Garden", "Bar"],
-          images: ["https://images.unsplash.com/photo-1520250497591-112f2f40a3f4"],
+          images: ["/image/4.jpg"],
           openHours: "24/7",
         },
       ],
@@ -109,7 +106,7 @@ export default function Tourism() {
           price: 80,
           address: "789 Food Street",
           cuisine: "European",
-          images: ["https://images.unsplash.com/photo-1517248135467-4c7edcad34c4"],
+          images: ["/image/1.jpg"],
           openHours: "11:00 AM - 10:00 PM",
         },
         {
@@ -119,7 +116,7 @@ export default function Tourism() {
           price: 100,
           address: "321 Ocean Drive",
           cuisine: "Japanese",
-          images: ["https://images.unsplash.com/photo-1579871494447-9811cf80d66c"],
+          images: ["/image/2.jpg"],
           openHours: "12:00 PM - 11:00 PM",
         },
       ],
@@ -136,7 +133,7 @@ export default function Tourism() {
           price: 15,
           address: "101 History Lane",
           type: "Museum",
-          images: ["https://images.unsplash.com/photo-1582711012124-a56cf82307a0"],
+          images: ["/image/5.jpg"],
           openHours: "9:00 AM - 6:00 PM",
         },
         {
@@ -146,7 +143,7 @@ export default function Tourism() {
           price: 10,
           address: "202 Garden Path",
           type: "Park",
-          images: ["https://images.unsplash.com/photo-1585320806297-9794b3e4eeae"],
+          images: ["/image/6.jpg"],
           openHours: "8:00 AM - 7:00 PM",
         },
       ],
@@ -163,50 +160,11 @@ export default function Tourism() {
       .filter((item) => item.price >= priceRange[0] && item.price <= priceRange[1])
       .sort((a, b) => (sortBy === "rating" ? b.rating - a.rating : a.price - b.price));
   };
-
-  const DetailDialog = ({ item }: DetailDialogProps) => (
-    <DialogContent className="max-w-3xl">
-      <DialogHeader>
-        <DialogTitle>{item.name}</DialogTitle>
-      </DialogHeader>
-      <div className="grid gap-4">
-        <img
-          src={item.images[0]}
-          alt={item.name}
-          className="h-64 w-full rounded-lg object-cover"
-        />
-        <div className="grid gap-2">
-          <p className="text-muted-foreground">{item.description}</p>
-          <div className="flex items-center gap-2">
-            <MapPin className="h-4 w-4" />
-            <span>{item.address}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4" />
-            <span>{item.openHours}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Star className="h-4 w-4 text-yellow-400" />
-            <span>{item.rating}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <DollarSign className="h-4 w-4" />
-            <span>${item.price}</span>
-          </div>
-          {'amenities' in item && (
-            <div className="flex flex-wrap gap-2">
-              {item.amenities.map((amenity: string) => (
-                <Badge key={amenity} variant="secondary">
-                  {amenity}
-                </Badge>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    </DialogContent>
-  );
-
+  const router = useRouter();
+ 
+  const handleCardClick = (item: TourismItem) => {
+    router.push(`/describtion?id=${item.name}`);
+  };
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8 space-y-4">
@@ -252,32 +210,34 @@ export default function Tourism() {
         {categories.map((category) => (
           <TabsContent key={category.id} value={category.id}>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {filteredItems(category.items).map((item, index: number) => (
-                <Dialog key={index}>
-                  <DialogTrigger asChild>
-                    <Card className="cursor-pointer transition-all hover:shadow-lg">
-                      <CardHeader>
-                        <CardTitle>{item.name}</CardTitle>
-                        <CardDescription>{item.description}</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <img
-                          src={item.images[0]}
-                          alt={item.name}
-                          className="mb-4 h-48 w-full rounded-lg object-cover"
-                        />
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-1">
-                            <Star className="h-4 w-4 text-yellow-400" />
-                            <span>{item.rating}</span>
-                          </div>
-                          <span>${item.price}</span>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </DialogTrigger>
-                  <DetailDialog item={item} />
-                </Dialog>
+              {filteredItems(category.items).map((item) => (
+               <Card 
+               key={item.name} 
+               className="cursor-pointer transition-all hover:shadow-lg"
+               onClick={() => handleCardClick(item)}
+             >
+                  <CardHeader>
+                    <CardTitle>{item.name}</CardTitle>
+                    <CardDescription>{item.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="relative w-full h-[200px] mb-4">
+                      <Image
+                        src={item.images[0]}
+                        alt={item.name}
+                        fill
+                        className="object-cover rounded-md"
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1">
+                        <Star className="h-4 w-4 text-yellow-400" />
+                        <span>{item.rating}</span>
+                      </div>
+                      <span>${item.price}</span>
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           </TabsContent>
